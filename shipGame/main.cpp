@@ -6,8 +6,10 @@ const int MAPHEIGHT=5;
 const int SHIPNUM=4;
 //味方のターンと相手のターンをそれぞれ0,1とする
 int TURN = 0;
-vector<int> dx={1,2,-1,-2,0,0,0,0};
-vector<int> dy={0,0,0,0,1,2,-1,-2};
+vector<int> dxA={0,0,1,1,1,-1,-1,-1};
+vector<int> dyA={1,-1,0,1,-1,0,1,-1};
+vector<int> dxM={1,2,-1,-2,0,0,0,0};
+vector<int> dyM={0,0,0,0,1,2,-1,-2};
 vector<vector<int>> v(MAPHEIGHT,vector<int>(MAPWIDTH,-1));
 vector<vector<int>> v2(MAPHEIGHT,vector<int>(MAPWIDTH,-1));
 void resetMap(){
@@ -17,17 +19,20 @@ void resetMap(){
 void showMap(){
     for(int i=0; i<MAPHEIGHT; i++){
         for(int j=0; j<MAPWIDTH; j++){
-            cout << v[i][j] << "   ";
+            if(v[i][j]!=-1)cout << "S" << v[i][j] << "   ";
+            else cout << "H" << "   ";
         }
         cout << endl;
     }
     cout << endl;
     for(int i=0; i<MAPHEIGHT; i++){
         for(int j=0; j<MAPWIDTH; j++){
-            cout << v2[i][j] << "   ";
+            if(v2[i][j]!=-1)cout << "S" << v2[i][j] << "   ";
+            else cout << "H" << "    ";
         }
         cout << endl;
     }
+    cout << endl;
 }
 
 
@@ -89,6 +94,8 @@ void setShips(){
     }
 }
 
+//-------------------------------------------
+//ゲームの流れの処理
 bool isAttackable(int x,int y){
     if(isInScope(x,y)==false){
         return false;
@@ -97,13 +104,11 @@ bool isAttackable(int x,int y){
     for(int i=0; i<MAPHEIGHT; i++){
         for(int j=0; j<MAPWIDTH; j++){
             //vの中に配置された船がある時、周囲8マスを攻撃範囲にする
-            if(isInScope(x,y)&&v[i][j]!=-1){
-                for(int k=0; k<dy.size(); k++){
-                    for(int l=0; l<dx.size(); l++){
-                        int targetX=j+dx[l];
-                        int targetY=i+dy[k];
-                        if(isInScope(targetX,targetY))attackablePoint[targetY][targetX]=0;
-                    }
+            if(v[i][j]!=-1){
+                for(int k=0; k<dyA.size(); k++){
+                    int targetX=j+dxA[k];
+                    int targetY=i+dyA[k];
+                    if(isInScope(targetX,targetY))attackablePoint[targetY][targetX]=0;
                 }
             }
         }
@@ -117,10 +122,11 @@ int checkAttackResult(vector<vector<int>> &v,int x,int y){
     if(v[y][x]!=-1)return 0;
     //その他の判定
     else{
-        for(int i=0; i<dy.size(); i++){
-            int targetX=x+dx[i];
-            int targetY=y+dy[i];
-            if(v[targetY][targetX]!=-1){
+        for(int i=0; i<dyA.size(); i++){
+            int targetX=x+dxA[i];
+            int targetY=y+dyA[i];
+            if(isInScope(targetX,targetY)&&setTargetMap()[targetY][targetX]!=-1){
+                cout << 111111 << endl;
                 return 1;
             }
         }
@@ -164,9 +170,9 @@ bool isMovable(vector<vector<int>> &v,int x,int y,Ship s){
         return false;
     }
     vector<vector<int>> movablePoint(MAPHEIGHT,vector<int>(MAPWIDTH,-1));
-    for(int i=0; i<dy.size(); i++){
-            int targetX=s.x+dx[i];
-            int targetY=s.y+dy[i];
+    for(int i=0; i<dyM.size(); i++){
+            int targetX=s.x+dxM[i];
+            int targetY=s.y+dyM[i];
             // cout << targetX << " " << targetY << endl;
             if(isInScope(targetX,targetY))movablePoint[targetY][targetX]=0;
         }
@@ -207,18 +213,59 @@ bool moveStep(){
     setShips();
     return true;
 }
+void showMat(vector<vector<int>> &v){
+    for(int i=0; i<v.size(); i++){
+        for(int j=0; j<v[i].size(); j++){
+            cout << v[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
 
+pair<int,int> findBestPos(vector<vector<int>> &checkedMatrix){
+    int maxCoverage = 0;
+    pair<int,int> bestPos;
+    
+    for(int i=0; i<MAPHEIGHT; i++){
+        for(int j=0; j<MAPWIDTH; j++){
+            if(checkedMatrix[i][j]!=-1){
+                int coverage=0;
+                for(int k=0; k<dyA.size(); k++){
+                    int targetY=i+dyA[k];
+                    int targetX=j+dxA[k];
+                    if(isInScope(targetX,targetY)&&checkedMatrix[targetY][targetX]!=-1)coverage++;
+                }
+                if(checkedMatrix[i][j]!=-1&&coverage>maxCoverage){
+                    maxCoverage=coverage;
+                    bestPos=make_pair(i,j);
+                    // cout << "check" << checkedMatrix[i][j] << endl;
+                }
+            }
+        }
+    }
+    return bestPos;
+}
+
+
+//-------------------------------------------
 int main(){
     showMap();
     Ship s1;
     Ship s2;
     Ship s3;
     Ship s4;
-    s1.set(0,0,HP,1);
-    s2.set(1,0,HP,2);
-    s3.set(2,0,HP,3);
-    s4.set(3,0,HP,4);
+    vector<vector<int>> checkedMatrix(MAPHEIGHT,vector<int>(MAPWIDTH,0));
+    vector<pair<int,int>> bestPosition(SHIPNUM);
+    for(int i=0; i<SHIPNUM; i++){
+        pair<int,int> tmp = findBestPos(checkedMatrix);
+        bestPosition[i].first=tmp.first;
+        bestPosition[i].second=tmp.second;
+        checkedMatrix[tmp.first][tmp.second]=-1;
+    }
     Ships={s1,s2,s3,s4};
+    for(int i=0; i<SHIPNUM; i++){
+        Ships[i].set(bestPosition[i].first,bestPosition[i].second,HP,i+1);
+    }
     Ship se1;
     Ship se2;
     Ship se3;
@@ -248,22 +295,22 @@ int main(){
     //     TURN=0;
     // }
     //---------------------------------------
-    while(true){
-        int tmp;
-        cout << "Player1:attack or move?(0 or 1)" << endl;
-        cin >> tmp;
-        if(tmp==0)while(!attackStep()){}
-        else if(tmp==1) while(!moveStep()){}
-        else cout << "無効な操作です" << endl;
-        TURN=1;
-        cout << "Player2:attack or move?(0 or 1)" << endl;
-        cin >> tmp;
-        if(tmp==0)while(!attackStep()){}
-        else if(tmp==1) while(!moveStep()){}
-        else cout << "無効な操作です" << endl;
-        TURN=0;
-    }
-    return 0;
+    // while(true){
+    //     int tmp;
+    //     cout << "Player1:attack or move?(0 or 1)" << endl;
+    //     cin >> tmp;
+    //     if(tmp==0)while(!attackStep()){}
+    //     else if(tmp==1) while(!moveStep()){}
+    //     else cout << "無効な操作です" << endl;
+    //     TURN=1;
+    //     cout << "Player2:attack or move?(0 or 1)" << endl;
+    //     cin >> tmp;
+    //     if(tmp==0)while(!attackStep()){}
+    //     else if(tmp==1) while(!moveStep()){}
+    //     else cout << "無効な操作です" << endl;
+    //     TURN=0;
+    // }
+    // return 0;
 }
 
 
