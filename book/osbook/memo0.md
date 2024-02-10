@@ -6,6 +6,7 @@
     >* 分銅を使う・使わないの二択→2進法そのもの
     >* LSB(Least Signifficant Bit)
     >* MSB(Most Signifficant Bit)
+    >* MSBで起こる桁上がり→キャリー
 * 負の数
     >* バイアス法→ずらし
     >* 符号ビット→最初の4桁を符号として使う
