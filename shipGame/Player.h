@@ -1,5 +1,5 @@
-#ifndef PARTNER_H
-#define PARTNER_H
+#ifndef PLAYER_H
+#define PLAYER_H
 #include <bits/stdc++.h>
 #include "constant.h"
 #include "DataAnalyzer.h"
@@ -15,10 +15,10 @@
 
 class Player{
     public:
-        void decideAction(DataCorrection dataCorrection){
-            this->attack(dataCorrection);
+        void decideAction(DataCorrection dataCorrection,vector<Order> playerOrders,vector<Order> partnerOrders){
+            this->attack(dataCorrection,playerOrders,partnerOrders);
         }
-        void attack(DataCorrection dataCorrection){
+        void attack(DataCorrection dataCorrection,vector<Order> playerOrders,vector<Order> partnerOrders){
             int x=0;
             int y=0;
             CoverData coverData=dataCorrection.getCoverData();

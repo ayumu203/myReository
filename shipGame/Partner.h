@@ -1,5 +1,5 @@
-#ifndef PLAYER_H
-#define PLAYER_H
+#ifndef PARTNER_H
+#define PARTNER_H
 #include <bits/stdc++.h>
 #include "constant.h"
 #include "DataAnalyzer.h"
@@ -12,16 +12,17 @@
 #include "AttackData.h"
 #include "AttackedData.h"
 #include "DataCorrection.h"
+#include "Order.h"
 using namespace std;
 class Partner{
     public:
-        char attack(DataCorrection dataCorrection);
-        void move();
+        Order attack(DataCorrection dataCorrection);
+        Order move();
 };
 
-char Partner::attack(DataCorrection dataCorrection){
+Order Partner::attack(DataCorrection dataCorrection){
     ShipPlacement shipPlacement = dataCorrection.getShipPlacement();
-    vector<vector<int>> arrangement=shipPlacement.getArrangement();
+    vector<vector<int>> array=shipPlacement.getArrangement();
     int x,y;
     x=-1;
     y=-1;
@@ -42,23 +43,30 @@ char Partner::attack(DataCorrection dataCorrection){
         }
     }
     cout << x << " " << y << endl;
-    if(arrangement[y][x]!=-1){
+    if(array[y][x]!=-1){
         std::cout << "命中" << endl;
-        return 'H';
+        Order od;
+        od.set('a',{x,y},'H','*','*');
+        return od;
     }
     for(int i=0; i<DYA.size(); i++){
         int targetX=x+DXA[i];
         int targetY=y+DYA[i];
-        if(DataAnalyzer::checkValidPosition(targetX,targetY)&&arrangement[targetY][targetX]!=-1){
+        if(DataAnalyzer::checkValidPosition(targetX,targetY)&&array[targetY][targetX]!=-1){
             std::cout << "波高し" << endl;
-            return 'W';
+            Order od;
+            od.set('a',{x,y},'W','*','*');
+            return od;
         }
     }
     //miss
-    return 'M';
+    Order od;
+    od.set('a',{x,y},'M','*','*');
+    return od;
+    return od;
 }
 
-void Partner::move(){
+Order Partner::move(){
     char direction;
     int count;
     while(!(direction=='n'||direction=='s'||direction=='e'||direction=='w')){
@@ -71,5 +79,8 @@ void Partner::move(){
         cout << "マス" << endl;
     }
     cout << direction << "方向に" << count << "マス移動" << endl;
+    Order od;
+    od.set('m',{-1,-1},'*',direction,count);
+    return od;
 }
 #endif
