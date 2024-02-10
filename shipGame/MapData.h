@@ -25,7 +25,7 @@ class MapData{
         int getWidth(){
             return this->width;
         }
-        vector<vector<int>>& getArray(){
+        vector<vector<int>> getArray(){
             return this->array;
         }
         void showArray(){

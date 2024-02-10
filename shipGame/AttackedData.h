@@ -11,7 +11,7 @@
 #include "CoverData.h"
 #include "AttackData.h"
 
-class AttackedData:MapData{
+class AttackedData: public MapData{
     
 };
 

@@ -1,5 +1,5 @@
-#ifndef PLAYER_H
-#define PLAYER_H
+#ifndef PARTNER_H
+#define PARTNER_H
 #include <bits/stdc++.h>
 #include "constant.h"
 #include "DataAnalyzer.h"

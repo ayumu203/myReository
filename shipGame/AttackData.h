@@ -10,7 +10,7 @@
 #include "MapData.h"
 #include "CoverData.h"
 
-class AttackData:MapData{
+class AttackData: public MapData{
     
 };
 

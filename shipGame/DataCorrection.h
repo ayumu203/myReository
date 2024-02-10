@@ -16,10 +16,14 @@ class DataCorrection{
     private:
         ShipPlacement shipPlacement;
         CoverData coverData;
+        AttackData attackData;
+        AttackedData attackedData;
     public:
-        void set(ShipPlacement shipPlacement,CoverData coverData){
+        void set(ShipPlacement shipPlacement,CoverData coverData,AttackData attackData,AttackedData attackedData){
             this->shipPlacement=shipPlacement;
             this->coverData=coverData;
+            this->attackData=attackData;
+            this->attackedData=attackedData;
         }
         ShipPlacement getShipPlacement(){
             return this->shipPlacement;

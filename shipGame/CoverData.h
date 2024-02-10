@@ -11,7 +11,7 @@
 #include "CoverData.h"
 #include "AttackData.h"
 
-class CoverData:MapData{
+class CoverData: public MapData{
     public:
     void setCoverage(ShipPlacement shipPlacement){
         int height=this->getHeight();
